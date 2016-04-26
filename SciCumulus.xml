@@ -1,0 +1,24 @@
+<SciCumulus>
+	<environment type="LOCAL"/>
+	<constraint workflow_exectag="homework" cores="2" performance="false"/>
+	<workspace workflow_dir="/home/danieljunior/Área de Trabalho/homework/workspace"/>
+	<database name="ssc" username="postgres" password="postgres" port="5432" server="localhost"/>
+	<conceptualWorkflow tag="homework" description="">
+		<activity tag="MAFFT" description="" type="MAP" activation="./experiment.cmd" template="%=WFDIR%/template_mafft">
+			<relation reltype="Input" name="imafft"/>
+			<relation reltype="Output" name="omafft"/>
+			<field name="NAME" type="file" input="imafft" output="omafft"/>
+    	</activity>
+    <!--
+	    <activity tag="act2" description="" type="MAP" activation="java -jar %=WFDIR%/bin/Sleep.jar ID=%=ID% T2=%=T2%">
+			<relation reltype="Input" dependency="act1"/>
+			<relation reltype="Output" name="OMod1Act2" />
+			<field name="ID" type="float" output="OMod1Act2" decimalplaces="0"/>
+			<field name="T2" type="float" output="OMod1Act2" decimalplaces="0"/>
+    	</activity>
+    -->
+	</conceptualWorkflow>
+	<executionWorkflow tag="homework" execmodel="DYN_FAF" expdir="%=WFDIR%/exp" adaptive="false">
+		<relation name="imafft" filename="input.dataset"/>
+	</executionWorkflow>
+</SciCumulus>
