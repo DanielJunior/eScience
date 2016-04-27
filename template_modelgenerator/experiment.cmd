@@ -1,0 +1,1 @@
+java -jar %=WFDIR%/bin/modelgenerator.jar %=NAME%.phylip 6 > %=NAME%.mg

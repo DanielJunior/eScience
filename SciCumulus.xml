@@ -1,24 +1,41 @@
 <SciCumulus>
+	
 	<environment type="LOCAL"/>
 	<constraint workflow_exectag="homework" cores="2" performance="false"/>
-	<workspace workflow_dir="/home/danieljunior/Área de Trabalho/homework/workspace"/>
+	<workspace workflow_dir="/home/danieljunior/Área de Trabalho/homework"/>
 	<database name="ssc" username="postgres" password="postgres" port="5432" server="localhost"/>
 	<conceptualWorkflow tag="homework" description="">
-		<activity tag="MAFFT" description="" type="MAP" activation="./experiment.cmd" template="%=WFDIR%/template_mafft">
+		
+		<activity tag="mafft" description="" type="MAP" activation="mafft %=NAME%.fasta > %=NAME%.mafft
+" template="%=WFDIR%/template_mafft">
 			<relation reltype="Input" name="imafft"/>
 			<relation reltype="Output" name="omafft"/>
 			<field name="NAME" type="file" input="imafft" output="omafft"/>
     	</activity>
-    <!--
-	    <activity tag="act2" description="" type="MAP" activation="java -jar %=WFDIR%/bin/Sleep.jar ID=%=ID% T2=%=T2%">
-			<relation reltype="Input" dependency="act1"/>
-			<relation reltype="Output" name="OMod1Act2" />
-			<field name="ID" type="float" output="OMod1Act2" decimalplaces="0"/>
-			<field name="T2" type="float" output="OMod1Act2" decimalplaces="0"/>
-    	</activity>
-    -->
+
+  		 <activity tag="readseq" type="MAP" template="%=WFDIR%/template_readseq" activation="java -jar %=WFDIR%/bin/readseq.jar -all -f=12 %=NAME%.mafft -o %=NAME%.phylip" description="">
+                <relation reltype="Input" dependency="mafft"/>
+                <relation reltype="Output" name="oreadseq"/>
+                <field name="FILE" type="file" input="omafft" output="oreadseq"/>
+        </activity>
+
+        <activity tag="modelgenerator" type="MAP" template="%=WFDIR%/template_modelgenerator" activation="java -jar %=WFDIR%/bin/modelgenerator.jar %=NAME%.phylip 6 > %=NAME%.mg" description="">
+                <relation reltype="Input" dependency="readseq"/>
+                <relation reltype="Output" name="omodelgenerator" />
+                <field name="FILE" type="file" input="oreadseq" output="omodelgenerator"/>
+        </activity>
+
+        <activity tag="raxml" type="MAP" template="%=WFDIR%/template_raxml" activation="
+        	raxmlHPC -s %=NAME%.phylip -n phylip_raxml_tree1.singleTree -c 4 -f d -m model && raxmlHPC -s %=NAME%.phylip -n phylip_tree2.raxml -c 4 -f d -m model -b 234534251 -N bootstrap && raxmlHPC -f b -m model -c 4 -s %=NAME%.phylip + -z RAxML_bootstrap.phylip_tree2.raxml –t RAxML_bestTree.phylip_raxml_tree1.singleTree -n phylip_tree3.BS_TREE" description="">
+                <relation reltype="Input" dependency="readseq"/>
+                <relation reltype="Output" name="oraxml" />
+                <field name="FILE" type="file" input="omodelgenerator" output="oraxml"/>
+        
+        </activity>
 	</conceptualWorkflow>
+	
 	<executionWorkflow tag="homework" execmodel="DYN_FAF" expdir="%=WFDIR%/exp" adaptive="false">
 		<relation name="imafft" filename="input.dataset"/>
 	</executionWorkflow>
+
 </SciCumulus>

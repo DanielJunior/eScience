@@ -1,0 +1,1 @@
+java -jar %=WFDIR%/bin/readseq.jar -all -f=12 %=NAME%.mafft -o %=NAME%.phylip
